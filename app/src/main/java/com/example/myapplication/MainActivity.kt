@@ -63,13 +63,13 @@ fun IndexPage() {
     )
     Column{
         displayName("Kurylenko")
+        Spacer(modifier = Modifier.height(70.dp))
         ImageCarousel()
     }
 }
 
 @Composable
 fun PhotoBio() {
-
 }
 
 @Composable
@@ -79,6 +79,27 @@ fun Spaces() {
 
 @Composable
 fun ImageCarousel() {
+    Column(
+        modifier = Modifier
+            .background(Color.Transparent)
+            .fillMaxWidth()
+            .wrapContentSize(Alignment.Center)
+    ) {
+        Text(
+            modifier = Modifier
+                .height(80.dp)
+                .padding(25.dp),
+            text = "Photos from previous sessions",
+            color = Color.DarkGray, // Text color
+
+            style = TextStyle(
+                fontFamily = FontFamily.SansSerif,
+                fontSize = 20.sp,
+                fontWeight = FontWeight.Light
+            ),
+            textAlign = TextAlign.Center
+        )
+    }
     val sliderList = remember {
         mutableListOf(
             "https://www.brides.com/thmb/fJSfAbT8DxJs4dW79wcWZEQZgJs=/1500x0/filters:no_upscale():max_bytes(150000):strip_icc()/must-take-wedding-photos-bride-groom-walk-clary-prfeiffer-photography-0723-primary-b4221bcb1a2b43e6b0820a8c3e3bce52.jpg",
@@ -86,12 +107,9 @@ fun ImageCarousel() {
             "https://b3031951.smushcdn.com/3031951/wp-content/uploads/2020/03/LA-430-scaled.jpg?lossy=0&strip=1&webp=1"
         )
     }
-    Box(
-        modifier = Modifier
-            .padding(20.dp)
-    )
     CustomSlider(sliderList = sliderList)
 }
+
 
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
@@ -115,7 +133,7 @@ fun CustomSlider(
         horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.Center
     ) {
         Row(
-            modifier = modifier.fillMaxWidth(),
+            modifier = modifier.height(150.dp),
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.Center,
         ) {
