@@ -22,6 +22,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.graphics.vector.ImageVector
@@ -41,6 +42,7 @@ import coil.request.ImageRequest
 import coil.size.Scale
 import com.example.myapplication.ui.theme.MyApplicationTheme
 import kotlinx.coroutines.launch
+import org.intellij.lang.annotations.JdkConstants.HorizontalAlignment
 import kotlin.math.absoluteValue
 
 class SessionsActivity : ComponentActivity() {
@@ -65,11 +67,17 @@ fun IndexPage() {
         DisplayName("Kurylenko")
         Spacer(modifier = Modifier.height(70.dp))
         ImageCarousel()
+        PhotoBio()
     }
 }
 
 @Composable
 fun PhotoBio() {
+    Box(
+        modifier = Modifier
+            .background(Color.LightGray, shape = RoundedCornerShape(50.dp))
+
+    )
 }
 
 @Composable
@@ -78,18 +86,32 @@ fun Spaces() {
 }
 
 @Composable
-fun ImageCarousel() {
+fun DividerLine() {
     Column(
-        modifier = Modifier
-            .background(Color.Transparent)
-            .fillMaxWidth()
-            .wrapContentSize(Alignment.Center)
+        horizontalAlignment = Alignment.CenterHorizontally
     ) {
+        Box(
+            modifier = Modifier
+                .width(width = 330.dp)
+                .height(height = 3.dp)
+                .background(Color.LightGray.copy(alpha = 0.5f), shape = RoundedCornerShape(30.dp))
+        )
+    }
+}
+
+@Composable
+fun ImageCarousel() {
+    Column(modifier = Modifier
+            .background(Color.Transparent)
+            .fillMaxWidth(),
+        horizontalAlignment = Alignment.CenterHorizontally
+    ) {
+        DividerLine()
         Text(
             modifier = Modifier
-                .height(80.dp)
-                .padding(25.dp),
-            text = "Photos from previous sessions",
+                .height(54.dp)
+                .padding(15.dp),
+            text = "Photos from previous sessions:",
             color = Color.DarkGray, // Text color
 
             style = TextStyle(
@@ -99,18 +121,19 @@ fun ImageCarousel() {
             ),
             textAlign = TextAlign.Center
         )
+        val sliderList = remember {
+            mutableListOf(
+                "https://www.brides.com/thmb/fJSfAbT8DxJs4dW79wcWZEQZgJs=/1500x0/filters:no_upscale():max_bytes(150000):strip_icc()/must-take-wedding-photos-bride-groom-walk-clary-prfeiffer-photography-0723-primary-b4221bcb1a2b43e6b0820a8c3e3bce52.jpg",
+                "https://media.istockphoto.com/id/1190043570/photo/happy-wedding-photography-of-bride-and-groom-at-wedding-ceremony-wedding-tradition-sprinkled.jpg?s=612x612&w=0&k=20&c=_aCIW5-iOIiaDdqin_50kvBcbFbIxSULHHamPUILE0c=",
+                "https://b3031951.smushcdn.com/3031951/wp-content/uploads/2020/03/LA-430-scaled.jpg?lossy=0&strip=1&webp=1"
+            )
+        }
+        CustomSlider(sliderList = sliderList)
+        DividerLine()
     }
-    val sliderList = remember {
-        mutableListOf(
-            "https://www.brides.com/thmb/fJSfAbT8DxJs4dW79wcWZEQZgJs=/1500x0/filters:no_upscale():max_bytes(150000):strip_icc()/must-take-wedding-photos-bride-groom-walk-clary-prfeiffer-photography-0723-primary-b4221bcb1a2b43e6b0820a8c3e3bce52.jpg",
-            "https://media.istockphoto.com/id/1190043570/photo/happy-wedding-photography-of-bride-and-groom-at-wedding-ceremony-wedding-tradition-sprinkled.jpg?s=612x612&w=0&k=20&c=_aCIW5-iOIiaDdqin_50kvBcbFbIxSULHHamPUILE0c=",
-            "https://b3031951.smushcdn.com/3031951/wp-content/uploads/2020/03/LA-430-scaled.jpg?lossy=0&strip=1&webp=1"
-        )
-    }
-    CustomSlider(sliderList = sliderList)
 }
 
-
+//TODO: Make it that when you click on image, it zooms a little bit
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun CustomSlider(
@@ -133,7 +156,7 @@ fun CustomSlider(
         horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.Center
     ) {
         Row(
-            modifier = modifier.height(150.dp),
+            modifier = modifier.height(120.dp),
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.Center,
         ) {
@@ -158,6 +181,7 @@ fun CustomSlider(
                         scaleX = scaleFactor
                         scaleY = scaleFactor
                     }
+
                     .alpha(
                         scaleFactor.coerceIn(0f, 1f)
                     )
@@ -189,7 +213,7 @@ fun CustomSlider(
             repeat(sliderList.size) {
                 val color = if (pagerState.currentPage == it) dotsActiveColor else dotsInActiveColor
                 Box(modifier = modifier
-                    .padding(2.dp)
+                    .padding(5.dp)
                     .clip(CircleShape)
                     .size(dotsSize)
                     .background(color)
