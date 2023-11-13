@@ -1,39 +1,61 @@
 package com.example.myapplication
 
+import android.icu.text.BreakIterator
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
+import androidx.compose.animation.animateContentSize
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.rememberPagerState
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.BasicTextField
+import androidx.compose.foundation.text.ClickableText
+import androidx.compose.foundation.text.KeyboardActions
+import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.KeyboardArrowLeft
 import androidx.compose.material.icons.filled.KeyboardArrowRight
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.derivedStateOf
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.platform.LocalFontFamilyResolver
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.AnnotatedString
+import androidx.compose.ui.text.Paragraph
+import androidx.compose.ui.text.TextLayoutResult
 import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.Constraints
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -58,32 +80,87 @@ class SessionsActivity : ComponentActivity() {
 
 @Composable
 fun IndexPage() {
-    Box(
-        modifier = Modifier
-            .fillMaxSize()
-            .background(color = Color(0xFFEBE3D5))
-    )
-    Column{
-        DisplayName("Kurylenko")
-        Spacer(modifier = Modifier.height(70.dp))
-        ImageCarousel()
-        PhotoBio()
+    val scrollableState = rememberScrollState()
+    Box( modifier = Modifier
+        .fillMaxSize()
+        .background(color = Color(0xFFEBE3D5))
+        .verticalScroll(state = scrollableState)
+    ) {
+        Column(
+            modifier = Modifier
+        ) {
+            DisplayName("Kurylenko")
+            Spacer(modifier = Modifier.height(70.dp))
+            ImageCarousel()
+            UserBio(modifier = Modifier.padding(16.dp))
+            // TODO: FIX TOOLBAR FROM MAINACTIVITY FOR IT TO WORK HERE (it overlays all other components)
+        }
+
     }
 }
 
 @Composable
-fun PhotoBio() {
+private fun UserBio(modifier: Modifier) {
+    var textLayoutResult by remember { mutableStateOf<TextLayoutResult?>(null) }
+    val isExpandable by remember { derivedStateOf { textLayoutResult?.didOverflowHeight ?: false } }
+    var isExpanded by remember { mutableStateOf(false) }
+    val isButtonShown by remember { derivedStateOf { isExpandable || isExpanded } }
+
+    // Use Box to align the Column within the container
     Box(
-        modifier = Modifier
-            .background(Color.LightGray, shape = RoundedCornerShape(50.dp))
+        modifier = modifier
+            .fillMaxWidth()
+            .padding(horizontal = 16.dp), // Adjust padding as needed
+        contentAlignment = Alignment.CenterEnd // Align the content to the end (right)
+    ) {
+        Column(
+            modifier = Modifier
+                .background(Color.Gray.copy(alpha = 0.3f), shape = RoundedCornerShape(16.dp))
+                .width(340.dp)
+        ) {
+            Text(
+                text = "               About user:",
+                modifier = Modifier
+                    .animateContentSize()
+                    .padding(horizontal = 15.dp, vertical = 5.dp),
+                maxLines = if (isExpanded) Int.MAX_VALUE else 5,
+                overflow = TextOverflow.Ellipsis,
+                onTextLayout = { textLayoutResult = it },
+                style = TextStyle(
+                    fontFamily = FontFamily.SansSerif,
+                    fontSize = 23.sp,
+                    fontWeight = FontWeight.Bold,
+                )
+            )
+            Text(
+                text = "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.",
+                modifier = Modifier
+                    .animateContentSize()
+                    .padding(horizontal = 15.dp, vertical = 5.dp),
+                maxLines = if (isExpanded) Int.MAX_VALUE else 3,
+                overflow = TextOverflow.Ellipsis,
+                onTextLayout = { textLayoutResult = it },
+                fontSize = 18.sp,
+                fontFamily = FontFamily.SansSerif,
+                fontWeight = FontWeight.Light
+            )
 
-    )
+            if (isButtonShown) {
+                TextButton(
+                    onClick = { isExpanded = !isExpanded },
+                    modifier = Modifier.fillMaxWidth(),
+                    shape = RectangleShape
+                ) {
+                    Text(
+                        text = (if (isExpanded) "Collapse" else "Expand").uppercase(),
+                        color = Color.DarkGray
+                    )
+                }
+            }
+        }
+    }
 }
 
-@Composable
-fun Spaces() {
-
-}
 
 @Composable
 fun DividerLine() {
@@ -102,8 +179,8 @@ fun DividerLine() {
 @Composable
 fun ImageCarousel() {
     Column(modifier = Modifier
-            .background(Color.Transparent)
-            .fillMaxWidth(),
+        .background(Color.Transparent)
+        .fillMaxWidth(),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         DividerLine()
