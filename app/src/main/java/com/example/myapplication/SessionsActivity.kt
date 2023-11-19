@@ -1,11 +1,14 @@
 package com.example.myapplication
 
-import android.icu.text.BreakIterator
+import androidx.compose.material.AlertDialog
+import android.content.Intent
+import android.net.Uri
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.animation.animateContentSize
 import androidx.compose.foundation.ExperimentalFoundationApi
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
@@ -14,12 +17,9 @@ import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.foundation.text.BasicTextField
-import androidx.compose.foundation.text.ClickableText
-import androidx.compose.foundation.text.KeyboardActions
-import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.KeyboardArrowLeft
 import androidx.compose.material.icons.filled.KeyboardArrowRight
 import androidx.compose.material3.*
@@ -34,28 +34,20 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.platform.LocalDensity
-import androidx.compose.ui.platform.LocalFontFamilyResolver
 import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.text.AnnotatedString
-import androidx.compose.ui.text.Paragraph
 import androidx.compose.ui.text.TextLayoutResult
 import androidx.compose.ui.text.TextStyle
-import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.ui.unit.Constraints
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -64,7 +56,6 @@ import coil.request.ImageRequest
 import coil.size.Scale
 import com.example.myapplication.ui.theme.MyApplicationTheme
 import kotlinx.coroutines.launch
-import org.intellij.lang.annotations.JdkConstants.HorizontalAlignment
 import kotlin.math.absoluteValue
 
 class SessionsActivity : ComponentActivity() {
@@ -81,21 +72,133 @@ class SessionsActivity : ComponentActivity() {
 @Composable
 fun IndexPage() {
     val scrollableState = rememberScrollState()
-    Box( modifier = Modifier
-        .fillMaxSize()
-        .background(color = Color(0xFFEBE3D5))
-        .verticalScroll(state = scrollableState)
-    ) {
-        Column(
-            modifier = Modifier
+    Column(
+        modifier = Modifier
+            .fillMaxSize()
+            .background(color = Color(0xFFEBE3D5))
+            .verticalScroll(state = scrollableState),
         ) {
+        Box() {
             DisplayName("Kurylenko")
-            Spacer(modifier = Modifier.height(70.dp))
-            ImageCarousel()
-            UserBio(modifier = Modifier.padding(16.dp))
-            // TODO: FIX TOOLBAR FROM MAINACTIVITY FOR IT TO WORK HERE (it overlays all other components)
+            BackButton()
+        }
+        //Spacer(modifier = Modifier.height(70.dp))
+        DividerLine()
+        ImageCarousel()
+        DividerLine()
+        UserBio(modifier = Modifier.padding(16.dp))
+        DividerLine()
+        Spacer(modifier = Modifier.height(16.dp))
+        BookButton()
+        Spacer(modifier = Modifier.height(16.dp))
+        Row (
+        ) {
+            Contacts()
+        }
+    }
+}
+
+@Composable
+fun BookButton() {
+    Row(modifier = Modifier.fillMaxWidth(),
+        horizontalArrangement = Arrangement.Center) {
+        TextButton(modifier = Modifier
+            .background(
+                color = Color.Black//.copy(alpha = 0.3f)
+                ,shape = RoundedCornerShape(16.dp)
+            )
+            .width(300.dp)
+            .height(60.dp),
+            onClick = {
+                //Navigation to the payment page or whatever
+            }) {
+            Text(
+                text = "Book a photosession",
+                color = Color.White,
+                fontFamily = FontFamily.SansSerif,
+                fontWeight = FontWeight.Light,
+                fontSize = 23.sp
+            )
+        }
+    }
+}
+
+@Composable
+fun BlogTransfer() {
+    Row(modifier = Modifier.fillMaxWidth(),
+        horizontalArrangement = Arrangement.Center) {
+        TextButton(onClick = {
+//TODO: transfer to a blog page
+        },
+            modifier = Modifier
+                .background(Color(0xFF776B5D).copy(alpha = 0.3f),
+                    shape = RoundedCornerShape(16.dp)))
+        {
+            Text(text = "Blog",
+                color = Color.Black,
+                fontFamily = FontFamily.SansSerif)
+        }
+    }
+}
+
+//TODO: When contacts will be known, insert them instead of just links to the main pages of the sites
+@Composable
+fun Contacts() {
+    val context = LocalContext.current
+    val intent1 = remember { Intent(Intent.ACTION_VIEW, Uri.parse("https://www.instagram.com/")) }
+    val intent2 = remember { Intent(Intent.ACTION_VIEW, Uri.parse("https://web.telegram.org")) }
+    val intent3 = remember { Intent(Intent.ACTION_VIEW, Uri.parse("https://www.facebook.com/")) }
+
+    Column(modifier = Modifier.fillMaxWidth(), horizontalAlignment = Alignment.CenterHorizontally) {
+        val dialogOpen = remember { mutableStateOf(false) }
+
+        TextButton(onClick = { dialogOpen.value = true },
+            modifier = Modifier.background(Color(0xFF776B5D).copy(alpha = 0.3f), shape = RoundedCornerShape(16.dp))) {
+            Text(text = "Contacts", color = Color.Black, fontFamily = FontFamily.SansSerif)
         }
 
+        if (dialogOpen.value) {
+            AlertDialog(
+                onDismissRequest = { dialogOpen.value = false },
+                buttons = {
+                    Row(modifier = Modifier
+                        .width(300.dp)
+                        .height(100.dp)
+                        .padding(20.dp),
+                        horizontalArrangement = Arrangement.SpaceBetween) {
+                            Image(painter = painterResource(id = R.drawable.instagram), contentDescription = null,
+                                modifier = Modifier
+                                    .clickable { context.startActivity(intent1) }
+                                    .size(60.dp)
+                            )
+                        Image(painter = painterResource(id = R.drawable.telegram), contentDescription = null,
+                            modifier = Modifier
+                                .clickable { context.startActivity(intent2) }
+                                .size(60.dp)
+                        )
+                        Image(painter = painterResource(id = R.drawable.facebook), contentDescription = null,
+                            modifier = Modifier
+                                .clickable { context.startActivity(intent3) }
+                                .size(60.dp)
+                        )
+                    }
+                }
+            )
+        }
+    }
+}
+
+@Composable
+fun BackButton() {
+    IconButton(
+        onClick = {
+                  //TODO: we'll decide to what it will return later
+        },
+        modifier = Modifier
+            .padding(6.dp)
+            .background(color = Color.Transparent, shape = CircleShape)
+    ) {
+        Icon(Icons.Filled.ArrowBack, contentDescription = "Return-To-MainActivity-Button")
     }
 }
 
@@ -119,7 +222,7 @@ private fun UserBio(modifier: Modifier) {
                 .width(340.dp)
         ) {
             Text(
-                text = "               About user:",
+                text = "                  Resume:",
                 modifier = Modifier
                     .animateContentSize()
                     .padding(horizontal = 15.dp, vertical = 5.dp),
@@ -161,10 +264,10 @@ private fun UserBio(modifier: Modifier) {
     }
 }
 
-
 @Composable
 fun DividerLine() {
     Column(
+        modifier = Modifier.fillMaxWidth(),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         Box(
@@ -177,13 +280,24 @@ fun DividerLine() {
 }
 
 @Composable
+fun Reviews() {
+    val sliderList = remember {
+        mutableListOf(
+            "https://www.brides.com/thmb/fJSfAbT8DxJs4dW79wcWZEQZgJs=/1500x0/filters:no_upscale():max_bytes(150000):strip_icc()/must-take-wedding-photos-bride-groom-walk-clary-prfeiffer-photography-0723-primary-b4221bcb1a2b43e6b0820a8c3e3bce52.jpg",
+            "https://media.istockphoto.com/id/1190043570/photo/happy-wedding-photography-of-bride-and-groom-at-wedding-ceremony-wedding-tradition-sprinkled.jpg?s=612x612&w=0&k=20&c=_aCIW5-iOIiaDdqin_50kvBcbFbIxSULHHamPUILE0c=",
+            "https://b3031951.smushcdn.com/3031951/wp-content/uploads/2020/03/LA-430-scaled.jpg?lossy=0&strip=1&webp=1"
+        )
+    }
+}
+
+@Composable
 fun ImageCarousel() {
     Column(modifier = Modifier
         .background(Color.Transparent)
         .fillMaxWidth(),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        DividerLine()
+
         Text(
             modifier = Modifier
                 .height(54.dp)
@@ -205,15 +319,14 @@ fun ImageCarousel() {
                 "https://b3031951.smushcdn.com/3031951/wp-content/uploads/2020/03/LA-430-scaled.jpg?lossy=0&strip=1&webp=1"
             )
         }
-        CustomSlider(sliderList = sliderList)
-        DividerLine()
+        CustomImageSlider(sliderList = sliderList)
     }
 }
 
 //TODO: Make it that when you click on image, it zooms a little bit
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
-fun CustomSlider(
+fun CustomImageSlider(
     modifier: Modifier = Modifier,
     sliderList: MutableList<String>,
     backwardIcon: ImageVector = Icons.Default.KeyboardArrowLeft,
@@ -221,12 +334,12 @@ fun CustomSlider(
     dotsActiveColor: Color = Color.DarkGray,
     dotsInActiveColor: Color = Color.LightGray,
     dotsSize: Dp = 10.dp,
-    pagerPaddingValues: PaddingValues = PaddingValues(horizontal = 65.dp),
+    pagerPaddingValues: PaddingValues = PaddingValues(horizontal = 45.dp),
     imageCornerRadius: Dp = 16.dp,
     imageHeight: Dp = 250.dp,
 ) {
 
-    val pagerState = rememberPagerState(pageCount = {sliderList.size}, initialPage = 0) // Set the pageCount and initialPage
+    val pagerState = rememberPagerState(pageCount = { Int.MAX_VALUE }, initialPage = Int.MAX_VALUE / 2)
     val scope = rememberCoroutineScope()
 
     Column(
@@ -238,7 +351,7 @@ fun CustomSlider(
             horizontalArrangement = Arrangement.Center,
         ) {
 
-            IconButton(enabled = pagerState.canScrollBackward, onClick = {
+            IconButton(enabled = true, onClick = {
                 scope.launch {
                     pagerState.animateScrollToPage(pagerState.currentPage - 1)
                 }
@@ -249,7 +362,8 @@ fun CustomSlider(
                 state = pagerState,
                 contentPadding = pagerPaddingValues,
                 modifier = modifier.weight(1f)
-            )  { page ->
+            ) { page ->
+                val adjustedPage = page % sliderList.size
                 val pageOffset = (pagerState.currentPage - page) + pagerState.currentPageOffsetFraction
                 val scaleFactor = 0.75f + (1f - 0.75f) * (1f - pageOffset.absoluteValue)
 
@@ -258,7 +372,6 @@ fun CustomSlider(
                         scaleX = scaleFactor
                         scaleY = scaleFactor
                     }
-
                     .alpha(
                         scaleFactor.coerceIn(0f, 1f)
                     )
@@ -266,7 +379,7 @@ fun CustomSlider(
                     .clip(RoundedCornerShape(imageCornerRadius))) {
                     AsyncImage(
                         model = ImageRequest.Builder(LocalContext.current).scale(Scale.FILL)
-                            .crossfade(true).data(sliderList[page]).build(),
+                            .crossfade(true).data(sliderList[adjustedPage]).build(),
                         contentDescription = "Image",
                         contentScale = ContentScale.Crop,
                         placeholder = painterResource(id = R.drawable.image1),
@@ -274,7 +387,7 @@ fun CustomSlider(
                     )
                 }
             }
-            IconButton(enabled = pagerState.currentPage != sliderList.size - 1, onClick = {
+            IconButton(enabled = true, onClick = {
                 scope.launch {
                     pagerState.animateScrollToPage(pagerState.currentPage + 1)
                 }
@@ -288,7 +401,7 @@ fun CustomSlider(
                 .fillMaxWidth(), horizontalArrangement = Arrangement.Center
         ) {
             repeat(sliderList.size) {
-                val color = if (pagerState.currentPage == it) dotsActiveColor else dotsInActiveColor
+                val color = if (pagerState.currentPage % sliderList.size == it) dotsActiveColor else dotsInActiveColor
                 Box(modifier = modifier
                     .padding(5.dp)
                     .clip(CircleShape)
@@ -296,13 +409,16 @@ fun CustomSlider(
                     .background(color)
                     .clickable {
                         scope.launch {
-                            pagerState.animateScrollToPage(it)
+                            pagerState.animateScrollToPage(pagerState.currentPage - pagerState.currentPage % sliderList.size + it)
                         }
                     })
             }
         }
     }
 }
+
+
+
 
 @Composable
 fun DisplayName(name: String) {
