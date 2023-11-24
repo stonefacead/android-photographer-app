@@ -33,7 +33,7 @@ fun MainMenu() {
         modifier = Modifier.fillMaxSize(),
         color = MaterialTheme.colorScheme.background
     ) {
-        BottomNavMenu()
+        ProfileScreen()
     }
 }
 
