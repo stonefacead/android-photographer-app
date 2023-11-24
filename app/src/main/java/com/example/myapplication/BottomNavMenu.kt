@@ -31,17 +31,17 @@ import androidx.compose.ui.unit.dp
 @Composable
 fun BottomNavMenu() {
     val items = listOf(
-        BottomNavItem(
+        MenuItem(
             title = "Order",
             selectedIcon = Icons.Filled.ShoppingCart,
             unselectedIcon = Icons.Outlined.ShoppingCart,
         ),
-        BottomNavItem(
+        MenuItem(
             title = "Home",
             selectedIcon = Icons.Filled.Home,
             unselectedIcon = Icons.Outlined.Home,
         ),
-        BottomNavItem(
+        MenuItem(
             title = "My profile",
             selectedIcon = Icons.Filled.AccountCircle,
             unselectedIcon = Icons.Outlined.AccountCircle,
