@@ -24,6 +24,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.drawBehind
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -93,3 +94,10 @@ fun BottomNavMenu() {
     }
 
 }
+
+@Preview(showBackground = true)
+@Composable
+fun BottomNavPreview() {
+    BottomNavMenu()
+}
+

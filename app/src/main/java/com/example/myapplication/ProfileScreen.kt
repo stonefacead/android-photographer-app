@@ -12,9 +12,11 @@ import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.foundation.shape.CircleShape
@@ -26,11 +28,16 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.CheckCircle
 import androidx.compose.material.icons.filled.DateRange
+import androidx.compose.material.icons.filled.Edit
+import androidx.compose.material.icons.filled.ExitToApp
 import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material.icons.outlined.CheckCircle
 import androidx.compose.material.icons.outlined.DateRange
+import androidx.compose.material3.DropdownMenu
+import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.Tab
 import androidx.compose.material3.TabRow
 import androidx.compose.material3.Text
@@ -48,6 +55,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.DpOffset
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 
@@ -83,6 +91,8 @@ fun ProfileScreen() {
 @Composable
 fun TopBar(
     modifier : Modifier = Modifier) {
+    var expanded by remember{ mutableStateOf(false)}
+
     Row(
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.SpaceBetween,
@@ -95,26 +105,38 @@ fun TopBar(
             tint = Color.Black,
             modifier = Modifier
                 .size(40.dp)
-
-            )
-        Spacer(modifier = Modifier.width(1.dp))
+                .weight(1f)
+        )
         Text(
             text = "My profile",
             fontWeight = FontWeight.Bold,
             overflow = TextOverflow.Ellipsis,
             fontSize = 35.sp,
             maxLines = 1,
-
+            modifier = Modifier.weight(8f),
+            textAlign = TextAlign.Center
         )
-        Spacer(modifier = Modifier.width(1.dp))
-        Icon(
-            imageVector = Icons.Default.MoreVert,
-            contentDescription = "Settings",
-            tint = Color.Black,
-            modifier = Modifier
-                .size(40.dp)
-
-        )
+        IconButton(onClick = {expanded = true}, modifier = Modifier.weight(1f)) {
+            Icon(Icons.Default.MoreVert, contentDescription = null, Modifier.size(40.dp))
+        }
+        DropdownMenu(
+            expanded = expanded,
+            offset = DpOffset(x = (-66).dp, y = (-10).dp),
+            onDismissRequest = { expanded = false }) {
+            DropdownMenuItem(
+                text = {Text(text = "Edit profile")},
+                onClick = { /*edit profile menu*/ },
+                leadingIcon = {
+                    Icon(Icons.Default.Edit, contentDescription = null)
+                })
+            DropdownMenuItem(
+                text = { Text(text = "Log out") },
+                onClick = { /*edit profile menu*/ },
+                leadingIcon = {
+                    Icon(Icons.Default.ExitToApp, contentDescription = null)
+                },
+                )
+        }
     }
 }
 
