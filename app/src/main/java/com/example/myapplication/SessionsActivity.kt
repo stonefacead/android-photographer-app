@@ -1,12 +1,18 @@
 package com.example.myapplication
 
+import android.content.Context
 import androidx.compose.material.AlertDialog
 import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
+import android.view.MotionEvent
+import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.animation.animateContentSize
+import androidx.compose.animation.core.Spring
+import androidx.compose.animation.core.animateDpAsState
+import androidx.compose.animation.core.spring
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -24,6 +30,7 @@ import androidx.compose.material.icons.filled.KeyboardArrowLeft
 import androidx.compose.material.icons.filled.KeyboardArrowRight
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.ExperimentalComposeApi
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -31,6 +38,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
+import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
@@ -38,6 +46,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.input.pointer.pointerInteropFilter
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
@@ -69,6 +78,7 @@ class SessionsActivity : ComponentActivity() {
     }
 }
 
+@OptIn(ExperimentalComposeUiApi::class)
 @Composable
 fun IndexPage() {
     val scrollableState = rememberScrollState()
@@ -77,7 +87,7 @@ fun IndexPage() {
             .fillMaxSize()
             .background(color = Color(0xFFEBE3D5))
             .verticalScroll(state = scrollableState),
-        ) {
+    ) {
         Box() {
             DisplayName("Kurylenko")
             BackButton()
@@ -95,8 +105,119 @@ fun IndexPage() {
         ) {
             Contacts()
         }
+        Spacer(modifier = Modifier.height(16.dp))
+        RatingBar()
+    }
+
+}
+@ExperimentalComposeUiApi
+@Composable
+fun RatingBar(
+    modifier: Modifier = Modifier
+) {
+    val context = LocalContext.current
+
+    val savedRating = remember(context) {
+        val sharedPreferences = context.getSharedPreferences(PREF_NAME, Context.MODE_PRIVATE)
+        sharedPreferences.getInt(KEY_RATING, 0)
+    }
+
+    var ratingState by remember {
+        mutableStateOf(savedRating)
+    }
+
+    var selected by remember {
+        mutableStateOf(false)
+    }
+
+    var hasGivenRating by remember {
+        mutableStateOf(savedRating > 0)
+    }
+
+    val size by animateDpAsState(
+        targetValue = if (selected) 72.dp else 64.dp,
+        spring(Spring.DampingRatioMediumBouncy)
+    )
+
+    Column(horizontalAlignment = Alignment.CenterHorizontally) {
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.Center
+        ) {
+            for (i in 1..5) {
+                Icon(
+                    painter = painterResource(id = R.drawable.ic_round_star_24),
+                    contentDescription = "star",
+                    modifier = modifier
+                        .width(size)
+                        .height(size)
+                        .pointerInteropFilter {
+                            when (it.action) {
+                                MotionEvent.ACTION_DOWN -> {
+                                    selected = true
+                                    ratingState = i
+                                }
+
+                                MotionEvent.ACTION_UP -> {
+                                    selected = false
+                                    saveRating(context, ratingState)
+                                    hasGivenRating = true
+                                }
+                            }
+                            true
+                        },
+                    tint = if (i <= ratingState) Color(0xFFFFD700) else Color(0xFFA2ADB1)
+                )
+            }
+        }
+        TextButton(
+            modifier = Modifier
+                .background(
+                    color = Color.Black,
+                    shape = RoundedCornerShape(16.dp)
+                )
+                .width(300.dp)
+                .height(60.dp),
+            onClick = {
+                if (hasGivenRating) {
+                    // Show a toast when the user clicks "Change your rating"
+                    Toast.makeText(context, "The rating has been given", Toast.LENGTH_SHORT).show()
+                    // Change the button text back to "Leave your review"
+                    hasGivenRating = false
+                }
+            }
+        ) {
+            var buttonText = if (hasGivenRating) {
+                "Apply"
+            } else {
+                "Leave your review!"
+            }
+
+            Text(
+                text = buttonText,
+                color = Color.White,
+                fontFamily = FontFamily.SansSerif,
+                fontWeight = FontWeight.Light,
+                fontSize = 23.sp
+            )
+        }
     }
 }
+
+
+
+private const val PREF_NAME = "MyPreferences"
+private const val KEY_RATING = "user_rating"
+
+// Function to save the rating in SharedPreferences
+private fun saveRating(context: Context, rating: Int) {
+    val sharedPreferences = context.getSharedPreferences(PREF_NAME, Context.MODE_PRIVATE)
+    with(sharedPreferences.edit()) {
+        putInt(KEY_RATING, rating)
+        apply()
+    }
+}
+
 
 @Composable
 fun BookButton() {
@@ -105,7 +226,7 @@ fun BookButton() {
         TextButton(modifier = Modifier
             .background(
                 color = Color.Black//.copy(alpha = 0.3f)
-                ,shape = RoundedCornerShape(16.dp)
+                , shape = RoundedCornerShape(16.dp)
             )
             .width(300.dp)
             .height(60.dp),
@@ -119,24 +240,6 @@ fun BookButton() {
                 fontWeight = FontWeight.Light,
                 fontSize = 23.sp
             )
-        }
-    }
-}
-
-@Composable
-fun BlogTransfer() {
-    Row(modifier = Modifier.fillMaxWidth(),
-        horizontalArrangement = Arrangement.Center) {
-        TextButton(onClick = {
-//TODO: transfer to a blog page
-        },
-            modifier = Modifier
-                .background(Color(0xFF776B5D).copy(alpha = 0.3f),
-                    shape = RoundedCornerShape(16.dp)))
-        {
-            Text(text = "Blog",
-                color = Color.Black,
-                fontFamily = FontFamily.SansSerif)
         }
     }
 }
@@ -166,11 +269,11 @@ fun Contacts() {
                         .height(100.dp)
                         .padding(20.dp),
                         horizontalArrangement = Arrangement.SpaceBetween) {
-                            Image(painter = painterResource(id = R.drawable.instagram), contentDescription = null,
-                                modifier = Modifier
-                                    .clickable { context.startActivity(intent1) }
-                                    .size(60.dp)
-                            )
+                        Image(painter = painterResource(id = R.drawable.instagram), contentDescription = null,
+                            modifier = Modifier
+                                .clickable { context.startActivity(intent1) }
+                                .size(60.dp)
+                        )
                         Image(painter = painterResource(id = R.drawable.telegram), contentDescription = null,
                             modifier = Modifier
                                 .clickable { context.startActivity(intent2) }
@@ -192,7 +295,7 @@ fun Contacts() {
 fun BackButton() {
     IconButton(
         onClick = {
-                  //TODO: we'll decide to what it will return later
+            //TODO: we'll decide to what it will return later
         },
         modifier = Modifier
             .padding(6.dp)
@@ -275,17 +378,6 @@ fun DividerLine() {
                 .width(width = 330.dp)
                 .height(height = 3.dp)
                 .background(Color.LightGray.copy(alpha = 0.5f), shape = RoundedCornerShape(30.dp))
-        )
-    }
-}
-
-@Composable
-fun Reviews() {
-    val sliderList = remember {
-        mutableListOf(
-            "https://www.brides.com/thmb/fJSfAbT8DxJs4dW79wcWZEQZgJs=/1500x0/filters:no_upscale():max_bytes(150000):strip_icc()/must-take-wedding-photos-bride-groom-walk-clary-prfeiffer-photography-0723-primary-b4221bcb1a2b43e6b0820a8c3e3bce52.jpg",
-            "https://media.istockphoto.com/id/1190043570/photo/happy-wedding-photography-of-bride-and-groom-at-wedding-ceremony-wedding-tradition-sprinkled.jpg?s=612x612&w=0&k=20&c=_aCIW5-iOIiaDdqin_50kvBcbFbIxSULHHamPUILE0c=",
-            "https://b3031951.smushcdn.com/3031951/wp-content/uploads/2020/03/LA-430-scaled.jpg?lossy=0&strip=1&webp=1"
         )
     }
 }
@@ -377,6 +469,7 @@ fun CustomImageSlider(
                     )
                     .padding(10.dp)
                     .clip(RoundedCornerShape(imageCornerRadius))) {
+                    val dialogOpen = remember { mutableStateOf(false) }
                     AsyncImage(
                         model = ImageRequest.Builder(LocalContext.current).scale(Scale.FILL)
                             .crossfade(true).data(sliderList[adjustedPage]).build(),
@@ -384,6 +477,7 @@ fun CustomImageSlider(
                         contentScale = ContentScale.Crop,
                         placeholder = painterResource(id = R.drawable.image1),
                         modifier = modifier.height(imageHeight)
+                            .clickable(onClick ={dialogOpen.value = true })
                     )
                 }
             }
