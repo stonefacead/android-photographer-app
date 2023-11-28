@@ -30,7 +30,6 @@ import androidx.compose.material.icons.filled.KeyboardArrowLeft
 import androidx.compose.material.icons.filled.KeyboardArrowRight
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.ExperimentalComposeApi
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -92,24 +91,126 @@ fun IndexPage() {
             DisplayName("Kurylenko")
             BackButton()
         }
-        //Spacer(modifier = Modifier.height(70.dp))
+        UserBio(modifier = Modifier.padding(16.dp))
+        Spacer(modifier = Modifier.height(16.dp))
+        Row(modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.SpaceEvenly)
+        {
+            PreviousPhotosButton()
+            Blog()
+        }
+        /*
         DividerLine()
         ImageCarousel()
         DividerLine()
-        UserBio(modifier = Modifier.padding(16.dp))
         DividerLine()
-        Spacer(modifier = Modifier.height(16.dp))
-        BookButton()
-        Spacer(modifier = Modifier.height(16.dp))
-        Row (
+        //Spacer(modifier = Modifier.height(16.dp))
+        //Spacer(modifier = Modifier.height(16.dp))
+        *//*Row (
         ) {
             Contacts()
+        }*//*
+        //Spacer(modifier = Modifier.height(16.dp))
+        //RatingBar()*/
+    }
+
+
+
+}
+
+@Composable
+fun PreviousPhotosButton(
+) {
+    Row(modifier = Modifier
+        //.fillMaxWidth()
+        //.offset(x = 40.dp)
+    ) {
+        val dialogOpen = remember { mutableStateOf(false) }
+        TextButton(modifier = Modifier
+            .background(
+                color = Color.Black//.copy(alpha = 0.3f)
+                , shape = RoundedCornerShape(16.dp)
+            )
+            .width(150.dp)
+            .height(80.dp),
+            onClick = {
+                dialogOpen.value = true
+            }) {
+            Text(
+                text = "Previous sessions",
+                color = Color.White,
+                fontFamily = FontFamily.SansSerif,
+                fontWeight = FontWeight.Light,
+                fontSize = 23.sp,
+                modifier = Modifier.padding(horizontal = 10.dp)
+            )
+            if (dialogOpen.value) {
+                AlertDialog(
+                    onDismissRequest = { dialogOpen.value = false },
+                    buttons = {
+                        Row(modifier = Modifier
+                            .fillMaxWidth()
+                            .height(400.dp),
+                            horizontalArrangement = Arrangement.Center) {
+                            ImageCarousel()
+                        }
+                    },
+                    modifier = Modifier.fillMaxWidth()
+                )
+            }
         }
-        Spacer(modifier = Modifier.height(16.dp))
-        RatingBar()
+    }
+}
+
+@Composable
+fun Blog(
+) {
+    Row(modifier = Modifier
+        //.fillMaxWidth()
+        //.offset(x = 200.dp)
+    ) {
+        val dialogOpen = remember { mutableStateOf(false) }
+        TextButton(modifier = Modifier
+            .background(
+                color = Color.Black//.copy(alpha = 0.3f)
+                , shape = RoundedCornerShape(16.dp)
+            )
+            .width(150.dp)
+            .height(80.dp),
+            onClick = {
+                dialogOpen.value = true
+            }) {
+            Text(
+                text = "Blog",
+                color = Color.White,
+                fontFamily = FontFamily.SansSerif,
+                fontWeight = FontWeight.Light,
+                fontSize = 23.sp,
+                modifier = Modifier.padding(horizontal=10.dp)
+            )
+            if (dialogOpen.value) {
+                AlertDialog(
+                    onDismissRequest = { dialogOpen.value = false },
+                    buttons = {
+                        Row(modifier = Modifier
+                            .fillMaxWidth()
+                            .height(400.dp),
+                            horizontalArrangement = Arrangement.Center) {
+                            Text(text = "Nothing rn",
+                                color = Color.Black,
+                                fontFamily = FontFamily.SansSerif,
+                                fontWeight = FontWeight.Light,
+                                fontSize = 23.sp)
+                        }
+                    },
+                    modifier = Modifier.fillMaxWidth()
+                )
+            }
+        }
     }
 
 }
+
 @ExperimentalComposeUiApi
 @Composable
 fun RatingBar(
@@ -135,7 +236,7 @@ fun RatingBar(
     }
 
     val size by animateDpAsState(
-        targetValue = if (selected) 72.dp else 64.dp,
+        targetValue = if (selected) 62.dp else 54.dp,
         spring(Spring.DampingRatioMediumBouncy)
     )
 
@@ -176,8 +277,8 @@ fun RatingBar(
                     color = Color.Black,
                     shape = RoundedCornerShape(16.dp)
                 )
-                .width(300.dp)
-                .height(60.dp),
+                .width(240.dp)
+                .height(50.dp),
             onClick = {
                 if (hasGivenRating) {
                     // Show a toast when the user clicks "Change your rating"
@@ -218,32 +319,6 @@ private fun saveRating(context: Context, rating: Int) {
     }
 }
 
-
-@Composable
-fun BookButton() {
-    Row(modifier = Modifier.fillMaxWidth(),
-        horizontalArrangement = Arrangement.Center) {
-        TextButton(modifier = Modifier
-            .background(
-                color = Color.Black//.copy(alpha = 0.3f)
-                , shape = RoundedCornerShape(16.dp)
-            )
-            .width(300.dp)
-            .height(60.dp),
-            onClick = {
-                //Navigation to the payment page or whatever
-            }) {
-            Text(
-                text = "Book a photosession",
-                color = Color.White,
-                fontFamily = FontFamily.SansSerif,
-                fontWeight = FontWeight.Light,
-                fontSize = 23.sp
-            )
-        }
-    }
-}
-
 //TODO: When contacts will be known, insert them instead of just links to the main pages of the sites
 @Composable
 fun Contacts() {
@@ -256,7 +331,9 @@ fun Contacts() {
         val dialogOpen = remember { mutableStateOf(false) }
 
         TextButton(onClick = { dialogOpen.value = true },
-            modifier = Modifier.background(Color(0xFF776B5D).copy(alpha = 0.3f), shape = RoundedCornerShape(16.dp))) {
+            modifier = Modifier
+                .width(200.dp)
+                .background(Color(0xFF776B5D).copy(alpha = 0.3f), shape = RoundedCornerShape(16.dp))) {
             Text(text = "Contacts", color = Color.Black, fontFamily = FontFamily.SansSerif)
         }
 
@@ -305,8 +382,10 @@ fun BackButton() {
     }
 }
 
+@ExperimentalComposeUiApi
 @Composable
 private fun UserBio(modifier: Modifier) {
+    var text1: String = "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua."
     var textLayoutResult by remember { mutableStateOf<TextLayoutResult?>(null) }
     val isExpandable by remember { derivedStateOf { textLayoutResult?.didOverflowHeight ?: false } }
     var isExpanded by remember { mutableStateOf(false) }
@@ -339,19 +418,26 @@ private fun UserBio(modifier: Modifier) {
                 )
             )
             Text(
-                text = "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.",
+                text = text1,
                 modifier = Modifier
                     .animateContentSize()
                     .padding(horizontal = 15.dp, vertical = 5.dp),
-                maxLines = if (isExpanded) Int.MAX_VALUE else 3,
+                maxLines = if (isExpanded) Int.MAX_VALUE else 12,
                 overflow = TextOverflow.Ellipsis,
                 onTextLayout = { textLayoutResult = it },
                 fontSize = 18.sp,
                 fontFamily = FontFamily.SansSerif,
                 fontWeight = FontWeight.Light
             )
-
             if (isButtonShown) {
+                if(isExpanded) {
+                    Spacer(modifier = Modifier.height(16.dp))
+                    DividerLine()
+                    Spacer(modifier = Modifier.height(16.dp))
+                    Contacts()
+                    Spacer(modifier = Modifier.height(16.dp))
+                    RatingBar()
+                }
                 TextButton(
                     onClick = { isExpanded = !isExpanded },
                     modifier = Modifier.fillMaxWidth(),
@@ -362,6 +448,13 @@ private fun UserBio(modifier: Modifier) {
                         color = Color.DarkGray
                     )
                 }
+            } else {
+                Spacer(modifier = Modifier.height(16.dp))
+                DividerLine()
+                Spacer(modifier = Modifier.height(16.dp))
+                Contacts()
+                Spacer(modifier = Modifier.height(16.dp))
+                RatingBar()
             }
         }
     }
@@ -428,7 +521,7 @@ fun CustomImageSlider(
     dotsSize: Dp = 10.dp,
     pagerPaddingValues: PaddingValues = PaddingValues(horizontal = 45.dp),
     imageCornerRadius: Dp = 16.dp,
-    imageHeight: Dp = 250.dp,
+    imageHeight: Dp = 200.dp,
 ) {
 
     val pagerState = rememberPagerState(pageCount = { Int.MAX_VALUE }, initialPage = Int.MAX_VALUE / 2)
@@ -438,7 +531,7 @@ fun CustomImageSlider(
         horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.Center
     ) {
         Row(
-            modifier = modifier.height(120.dp),
+            modifier = modifier.height(300.dp),
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.Center,
         ) {
@@ -476,8 +569,9 @@ fun CustomImageSlider(
                         contentDescription = "Image",
                         contentScale = ContentScale.Crop,
                         placeholder = painterResource(id = R.drawable.image1),
-                        modifier = modifier.height(imageHeight)
-                            .clickable(onClick ={dialogOpen.value = true })
+                        modifier = modifier
+                            .height(imageHeight)
+                            .clickable(onClick = { dialogOpen.value = true })
                     )
                 }
             }
