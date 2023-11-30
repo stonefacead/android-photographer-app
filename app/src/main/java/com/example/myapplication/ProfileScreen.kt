@@ -1,5 +1,6 @@
 package com.example.myapplication
 
+import android.content.Context.MODE_PRIVATE
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.border
@@ -21,6 +22,7 @@ import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material.AlertDialog
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.runtime.getValue
@@ -36,11 +38,14 @@ import androidx.compose.material.icons.outlined.CheckCircle
 import androidx.compose.material.icons.outlined.DateRange
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.Tab
 import androidx.compose.material3.TabRow
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
+import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.mutableStateOf
@@ -50,6 +55,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.painter.Painter
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
@@ -58,14 +64,29 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.DpOffset
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.compose.ui.window.DialogProperties
 import com.google.accompanist.systemuicontroller.rememberSystemUiController
 
+@ExperimentalMaterial3Api
 @Composable
 fun ProfileScreen() {
+    val sharedPreferences = LocalContext.current.getSharedPreferences("profile_prefs", MODE_PRIVATE)
+
     val systemUiController = rememberSystemUiController()
     val statusBarColor = Color.Transparent
     LaunchedEffect(statusBarColor) {
         systemUiController.setStatusBarColor(statusBarColor)}
+
+    var name by remember { mutableStateOf(sharedPreferences.getString("name", "stoneface") ?: "stoneface") }
+    var description by remember { mutableStateOf(sharedPreferences.getString("description", "Some info about me. I'm testing this shit rn. I need more text. \nI'm retarded.") ?: "Some info about me. I'm testing this shit rn. I need more text. \nI'm retarded.") }
+
+    LaunchedEffect(name, description) {
+        with(sharedPreferences.edit()) {
+            putString("name", name)
+            putString("description", description)
+            apply()
+        }
+    }
 
     val menuItems = listOf(
         MenuItem(
@@ -81,11 +102,32 @@ fun ProfileScreen() {
 
     )
     Column (modifier = Modifier.fillMaxSize()) {
+        var showDialog by remember { mutableStateOf(false) }
+
         TopBar(
-            modifier = Modifier.padding(10.dp)
+            modifier = Modifier.padding(10.dp),
+            onEditProfileClick = { showDialog = true }
         )
+
+        if (showDialog) {
+            EditProfileDialog(
+                newName = name,
+                newDescription = description,
+                onNameChange = { name = it },
+                onDescriptionChange = { description = it },
+                onApplyClick = {
+                    // Apply the changes here
+                    showDialog = false // Close the dialog
+                },
+                onCancelClick = {
+                    // Handle the cancel button click here
+                    showDialog = false // Close the dialog
+                }
+            )
+        }
+
         Spacer(modifier = Modifier.height(4.dp))
-        ProfileSection(name = "stoneface")
+        ProfileSection(name, description)
 
         Spacer(modifier = Modifier.height(50.dp))
         ProfileTabRow(menuItems = menuItems)
@@ -93,8 +135,62 @@ fun ProfileScreen() {
 
 }
 
+@ExperimentalMaterial3Api
+@Composable
+fun EditProfileDialog(
+    newName: String,
+    newDescription: String,
+    onNameChange: (String) -> Unit,
+    onDescriptionChange: (String) -> Unit,
+    onApplyClick: () -> Unit,
+    onCancelClick: () -> Unit
+) {
+    AlertDialog(
+        onDismissRequest = onCancelClick,
+        title = { Text("Edit Profile") },
+        text = {
+            Column(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(16.dp)
+            ) {
+                TextField(
+                    value = newName,
+                    onValueChange = { onNameChange(it) },
+                    label = { Text("New Name") }
+                )
+                Spacer(modifier = Modifier.height(16.dp))
+                TextField(
+                    value = newDescription,
+                    onValueChange = { onDescriptionChange(it) },
+                    label = { Text("New Description") }
+                )
+            }
+        },
+        buttons = {
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(8.dp),
+                horizontalArrangement = Arrangement.End
+            ) {
+                TextButton(onClick = onCancelClick) {
+                    Text("Cancel")
+                }
+                TextButton(onClick = {
+                    onApplyClick()
+                    onApplyClick() // Add another call to onApplyClick to update SharedPreferences
+                } ) {
+                    Text("Apply")
+                }
+            }
+        }
+    )
+}
+
 @Composable
 fun TopBar(
+    onEditProfileClick: () -> Unit,
     modifier : Modifier = Modifier) {
     var expanded by remember{ mutableStateOf(false)}
 
@@ -127,13 +223,18 @@ fun TopBar(
         DropdownMenu(
             expanded = expanded,
             offset = DpOffset(x = (-66).dp, y = (-10).dp),
-            onDismissRequest = { expanded = false }) {
+            onDismissRequest = { expanded = false }
+        ) {
             DropdownMenuItem(
-                text = {Text(text = "Edit profile")},
-                onClick = { /*edit profile menu*/ },
+                text = { Text(text = "Edit profile") },
+                onClick = {
+                    expanded = false
+                    onEditProfileClick() // Call the callback when edit profile is clicked
+                },
                 leadingIcon = {
                     Icon(Icons.Default.Edit, contentDescription = null)
-                })
+                }
+            )
             DropdownMenuItem(
                 text = { Text(text = "Log out") },
                 onClick = { /*edit profile menu*/ },
@@ -148,6 +249,7 @@ fun TopBar(
 @Composable
 fun ProfileSection (
     name: String,
+    description: String,
     modifier : Modifier = Modifier
 ) {
         Column(
@@ -169,7 +271,6 @@ fun ProfileSection (
                 overflow = TextOverflow.Ellipsis,
                 fontSize = 35.sp,
                 maxLines = 1,
-
             )
             Spacer(modifier = Modifier.width(16.dp))
             Row(
@@ -179,12 +280,11 @@ fun ProfileSection (
                     .fillMaxWidth()
             ) {
                 Text(
-                text = "Some info about me. I'm testing this shit rn. I need more text. \nI'm retarded.",
-                fontWeight = FontWeight.SemiBold,
-                overflow = TextOverflow.Ellipsis,
-                fontSize = 20.sp,
-
-                 )
+                    text = description,
+                    fontWeight = FontWeight.SemiBold,
+                    overflow = TextOverflow.Ellipsis,
+                    fontSize = 20.sp,
+                )
             }
         }
 }
@@ -263,6 +363,7 @@ fun ProfileTabRow(menuItems : List<MenuItem>) {
 
 
 @Preview(showBackground = true)
+@ExperimentalMaterial3Api
 @Composable
 fun ProfilePreview() {
     ProfileScreen()

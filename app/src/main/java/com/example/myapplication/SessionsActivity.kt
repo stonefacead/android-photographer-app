@@ -89,7 +89,6 @@ fun IndexPage() {
     ) {
         Box() {
             DisplayName("Kurylenko")
-            BackButton()
         }
         UserBio(modifier = Modifier.padding(16.dp))
         Spacer(modifier = Modifier.height(16.dp))
@@ -99,19 +98,6 @@ fun IndexPage() {
             PreviousPhotosButton()
             Blog()
         }
-        /*
-        DividerLine()
-        ImageCarousel()
-        DividerLine()
-        DividerLine()
-        //Spacer(modifier = Modifier.height(16.dp))
-        //Spacer(modifier = Modifier.height(16.dp))
-        *//*Row (
-        ) {
-            Contacts()
-        }*//*
-        //Spacer(modifier = Modifier.height(16.dp))
-        //RatingBar()*/
     }
 
 
@@ -368,20 +354,6 @@ fun Contacts() {
     }
 }
 
-@Composable
-fun BackButton() {
-    IconButton(
-        onClick = {
-            //TODO: we'll decide to what it will return later
-        },
-        modifier = Modifier
-            .padding(6.dp)
-            .background(color = Color.Transparent, shape = CircleShape)
-    ) {
-        Icon(Icons.Filled.ArrowBack, contentDescription = "Return-To-MainActivity-Button")
-    }
-}
-
 @ExperimentalComposeUiApi
 @Composable
 private fun UserBio(modifier: Modifier) {
@@ -573,6 +545,27 @@ fun CustomImageSlider(
                             .height(imageHeight)
                             .clickable(onClick = { dialogOpen.value = true })
                     )
+                    if(dialogOpen.value) {
+                        AlertDialog(onDismissRequest = {dialogOpen.value = false},
+                            modifier = Modifier.fillMaxSize(),
+                            buttons = {
+                                Box(
+                                    modifier = Modifier
+                                        .fillMaxSize()
+                                        .background(Color.Black)
+                                        .clickable { dialogOpen.value = false }
+                                ) {
+                                    AsyncImage(
+                                        model = ImageRequest.Builder(LocalContext.current).scale(Scale.FILL)
+                                            .crossfade(true).data(sliderList[pagerState.currentPage % sliderList.size]).build(),
+                                        contentDescription = "Image",
+                                        contentScale = ContentScale.Fit,
+                                        modifier = Modifier
+                                            .fillMaxSize()
+                                    )
+                                }
+                            })
+                    }
                 }
             }
             IconButton(enabled = true, onClick = {
