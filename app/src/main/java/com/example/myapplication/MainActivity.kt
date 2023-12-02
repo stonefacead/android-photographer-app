@@ -27,20 +27,22 @@ class MainActivity : ComponentActivity() {
     }
 }
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
+@ExperimentalMaterial3Api
 @Composable
 fun MainMenu() {
     Surface(
         modifier = Modifier.fillMaxSize(),
         color = MaterialTheme.colorScheme.background
     ) {
-        ProfileScreen()
+        MainNavigation()
+        //ProfileScreen()
+        //IndexPage()
     }
 }
 
-
-
 @Preview(showBackground = true)
+@ExperimentalMaterial3Api
 @Composable
 fun MainPreview() {
-    MainMenu()
+    MainNavigation()
 }
