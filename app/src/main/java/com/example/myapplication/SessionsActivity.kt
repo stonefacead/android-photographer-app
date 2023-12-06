@@ -291,12 +291,9 @@ fun RatingBar(
     }
 }
 
-
-
 private const val PREF_NAME = "MyPreferences"
 private const val KEY_RATING = "user_rating"
 
-// Function to save the rating in SharedPreferences
 private fun saveRating(context: Context, rating: Int) {
     val sharedPreferences = context.getSharedPreferences(PREF_NAME, Context.MODE_PRIVATE)
     with(sharedPreferences.edit()) {
@@ -442,7 +439,7 @@ fun DividerLine() {
             modifier = Modifier
                 .width(width = 330.dp)
                 .height(height = 3.dp)
-                .background(Color.LightGray.copy(alpha = 0.5f), shape = RoundedCornerShape(30.dp))
+                .background(Color.Gray.copy(alpha = 0.5f), shape = RoundedCornerShape(30.dp))
         )
     }
 }
@@ -597,9 +594,6 @@ fun CustomImageSlider(
         }
     }
 }
-
-
-
 
 @Composable
 fun DisplayName(name: String) {

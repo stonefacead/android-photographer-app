@@ -1,6 +1,8 @@
 package com.example.myapplication
 
 import android.annotation.SuppressLint
+import android.os.Build
+import androidx.annotation.RequiresApi
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
@@ -101,6 +103,7 @@ fun BottomNavMenu(navController: NavController) {
     }
 }
 
+@RequiresApi(Build.VERSION_CODES.O)
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun MainNavigation() {
@@ -127,23 +130,14 @@ fun MainNavigation() {
                     IndexPage()
                 }
                 composable("payment") {
-                    PaymentScreen()
+                    ScreenView()
                 }
             }
         }
     }
 }
 
-@Composable
-fun PaymentScreen() {
-    Box(
-        modifier = Modifier.fillMaxSize(),
-        contentAlignment = Alignment.Center
-    ) {
-        Text(text = "Payment Screen")
-    }
-}
-
+@RequiresApi(Build.VERSION_CODES.O)
 @Preview(showBackground = true)
 @Composable
 fun BottomNavMenuPreview() {

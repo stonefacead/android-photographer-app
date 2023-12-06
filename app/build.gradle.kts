@@ -79,4 +79,6 @@ dependencies {
     implementation ("androidx.appcompat:appcompat:1.6.1")
     implementation("androidx.preference:preference-ktx:1.2.1")
     implementation("com.google.accompanist:accompanist-systemuicontroller:0.27.0")
+    implementation ("io.github.vanpra.compose-material-dialogs:datetime:0.8.1-rc")
+    coreLibraryDesugaring("com.android.tools:desugar_jdk_libs:2.0.4")
 }
