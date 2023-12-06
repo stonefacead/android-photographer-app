@@ -23,6 +23,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.sp
@@ -61,13 +62,22 @@ fun ScreenView() {
         Spacer(modifier = Modifier.height(8.dp))
         DividerLine()
         Spacer(modifier = Modifier.height(8.dp))
-        Column(modifier = Modifier.fillMaxWidth(),
-            horizontalAlignment = Alignment.CenterHorizontally) {
-            Text(text = "Additional items:", fontSize = 30.sp, fontFamily = FontFamily.SansSerif, fontWeight = FontWeight.Light)
+        Column(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalAlignment = Alignment.CenterHorizontally
+        ) {
+            Text(
+                text = "Additional items:",
+                fontSize = 30.sp,
+                fontFamily = FontFamily.SansSerif,
+                fontWeight = FontWeight.Light
+            )
         }
         Spacer(modifier = Modifier.height(8.dp))
-        Row(modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.SpaceEvenly) {
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.SpaceEvenly
+        ) {
             val tagsWithPrices = listOf(
                 TagPrice("Field equipment", 500),
                 TagPrice("Inventory", 800),
@@ -81,26 +91,35 @@ fun ScreenView() {
         Spacer(modifier = Modifier.height(8.dp))
         DividerLine()
         Spacer(modifier = Modifier.height(16.dp))
+        Column(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalAlignment = Alignment.CenterHorizontally
+        ) {
+            Text(
+                text = "Additional Description",
+                fontSize = 30.sp,
+                fontFamily = FontFamily.SansSerif,
+                fontWeight = FontWeight.Light
+            )
+        }
         Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.Center)
         {//TODO: Fix this goddamn textfield
-            /*TextField(
-                value = "",
-                onValueChange = {},
-                placeholder = {
-                    Text(
-                        text = "Additional Description",
-                        color = Color.Gray
-                    )
-                },
-                shape = RoundedCornerShape(8.dp),
+            var additionalDescription by remember { mutableStateOf("") }
+            TextField(
+                value = additionalDescription,
+                onValueChange = { additionalDescription = it },
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(16.dp),
+                textStyle = TextStyle(fontSize = 20.sp),
                 colors = TextFieldDefaults.textFieldColors(
-                    focusedIndicatorColor = Color.Transparent,
-                    unfocusedIndicatorColor = Color.Transparent,
-                    disabledIndicatorColor = Color.Transparent,
                     textColor = Color.Black,
-                    cursorColor = Color.Black
+                    cursorColor = Color.Black,
+                    placeholderColor = Color.Gray,
+                    focusedIndicatorColor = Color.Transparent,
+                    unfocusedIndicatorColor = Color.Transparent
                 )
-            )*/
+            )
         }
         Spacer(modifier = Modifier.height(8.dp))
         Row(
