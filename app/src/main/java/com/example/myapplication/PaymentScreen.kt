@@ -1,7 +1,6 @@
 package com.example.myapplication
 
 import android.os.Build
-import android.text.style.BackgroundColorSpan
 import android.widget.Toast
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.annotation.RequiresApi
@@ -10,6 +9,7 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.Text
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -26,6 +26,8 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.unit.sp
 import com.vanpra.composematerialdialogs.MaterialDialog
 import com.vanpra.composematerialdialogs.datetime.date.datepicker
@@ -34,6 +36,8 @@ import com.vanpra.composematerialdialogs.rememberMaterialDialogState
 import java.time.LocalDate
 import java.time.LocalTime
 import java.time.format.DateTimeFormatter
+import android.content.Context
+import android.content.SharedPreferences
 
 @OptIn(ExperimentalMaterial3Api::class)
 @RequiresApi(Build.VERSION_CODES.O)
@@ -91,12 +95,12 @@ fun ScreenView() {
         Spacer(modifier = Modifier.height(8.dp))
         DividerLine()
         Spacer(modifier = Modifier.height(16.dp))
-        Column(
+        Row(
             modifier = Modifier.fillMaxWidth(),
-            horizontalAlignment = Alignment.CenterHorizontally
+            horizontalArrangement = Arrangement.Center
         ) {
             Text(
-                text = "Additional Description",
+                text = "Extra description",
                 fontSize = 30.sp,
                 fontFamily = FontFamily.SansSerif,
                 fontWeight = FontWeight.Light
@@ -121,7 +125,90 @@ fun ScreenView() {
                 )
             )
         }
+
+
+
         Spacer(modifier = Modifier.height(8.dp))
+        DividerLine()
+        Spacer(modifier = Modifier.height(8.dp))
+
+
+        // TextFields for Name, Surname, Phone Number, and Email
+        var name by remember { mutableStateOf("") }
+        var surname by remember { mutableStateOf("") }
+        var phoneNumber by remember { mutableStateOf("") }
+        var email by remember { mutableStateOf("") }
+        var isInputValid by remember { mutableStateOf(false) }
+        LaunchedEffect(name, surname, phoneNumber, email) {
+            isInputValid =
+                name.isNotEmpty() && surname.isNotEmpty() && phoneNumber.isNotEmpty() &&
+                        email.isNotEmpty()
+        }
+
+
+        // Helper function to validate email format
+        fun isValidEmail(email: String): Boolean {
+            // You can implement your own email validation logic here
+            return android.util.Patterns.EMAIL_ADDRESS.matcher(email).matches()
+        }
+
+
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.Center
+        ) {
+            Text(
+                text = "Contact information",
+                fontSize = 30.sp,
+                fontFamily = FontFamily.SansSerif,
+                fontWeight = FontWeight.Light
+            )
+        }
+        // Add these text fields in the Column
+        TextField(
+            value = name,
+            onValueChange = { name = it },
+            label = { Text("Name") },
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(16.dp),
+            textStyle = TextStyle(fontSize = 20.sp),
+        )
+
+        TextField(
+            value = surname,
+            onValueChange = { surname = it },
+            label = { Text("Surname") },
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(16.dp),
+            textStyle = TextStyle(fontSize = 20.sp),
+        )
+
+        TextField(
+            value = phoneNumber,
+            onValueChange = { phoneNumber = it },
+            label = { Text("Phone Number") },
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(16.dp),
+            textStyle = TextStyle(fontSize = 20.sp),
+            keyboardOptions = KeyboardOptions.Default.copy(keyboardType = KeyboardType.Number)
+        )
+
+        TextField(
+            value = email,
+            onValueChange = { email = it },
+            label = { Text("Email") },
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(16.dp),
+            textStyle = TextStyle(fontSize = 20.sp),
+            keyboardOptions = KeyboardOptions.Default.copy(keyboardType = KeyboardType.Email),
+            isError = email.isNotEmpty() && !isValidEmail(email),
+            visualTransformation = VisualTransformation.None
+        )
+
         Row(
             modifier = Modifier.fillMaxWidth(),
             horizontalArrangement = Arrangement.SpaceAround
@@ -141,22 +228,12 @@ fun ScreenView() {
                 modifier = Modifier.padding(vertical = 30.dp)
             )
         }
-        BookButton(pickedDate = pickedDate, pickedTime = pickedTime)
+        BookButton(
+            pickedDate = pickedDate,
+            pickedTime = pickedTime,
+            isInputValid = isInputValid
+        )
     }
-}
-
-fun calculateTotalPrice(selectedTags: List<String>): Int {
-    val basePrice = 3000
-    val additionalPrice = selectedTags.sumBy { tag ->
-        // You can adjust the prices based on your requirements
-        when (tag) {
-            "Field equipment" -> 500
-            "Inventory" -> 800
-            "Pets" -> 300
-            else -> 0
-        }
-    }
-    return basePrice + additionalPrice
 }
 
 @RequiresApi(Build.VERSION_CODES.O)
@@ -300,28 +377,6 @@ fun ComposeDateTimePicker(pickedDate: LocalDate,
     }
 }
 
-@Composable
-fun BookButton(pickedDate: LocalDate, pickedTime: LocalTime) {
-    val context = LocalContext.current
-
-    TextButton(
-        onClick = {
-            // Perform booking action here
-            Toast.makeText(
-                context,
-                "Booking the date $pickedDate at $pickedTime",
-                Toast.LENGTH_LONG
-            ).show()
-        },
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(horizontal = 16.dp)
-            .background(color = Color.Gray, shape = RoundedCornerShape(16.dp))
-            .padding(16.dp)
-    ) {
-        Text(text = "Book", fontSize = 30.sp, fontWeight = FontWeight.Light, fontFamily = FontFamily.SansSerif)
-    }
-}
 
 data class TagPrice(val tag: String, val price: Int)
 
@@ -362,6 +417,51 @@ fun SwappableTag(text: String, isSelected: Boolean, onTagClick: () -> Unit) {
     ) {
         Text(text = text, color = if (isSelected) Color.White else Color.Black)
     }
+}
+
+@Composable
+fun BookButton(pickedDate: LocalDate, pickedTime: LocalTime, isInputValid: Boolean) {
+    val context = LocalContext.current
+
+    TextButton(
+        onClick = {
+            // Perform booking action only if input is valid
+            if (isInputValid) {
+                Toast.makeText(
+                    context,
+                    "Booking the date $pickedDate at $pickedTime",
+                    Toast.LENGTH_LONG
+                ).show()
+            }
+        },
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(horizontal = 16.dp)
+            .background(
+                color = if (isInputValid) Color.Gray else Color.LightGray,
+                shape = RoundedCornerShape(16.dp)
+            )
+            .padding(16.dp),
+        enabled = isInputValid
+    ) {
+        Text(text = "Book", fontSize = 30.sp, fontWeight = FontWeight.Light, fontFamily = FontFamily.SansSerif)
+    }
+}
+
+
+
+fun calculateTotalPrice(selectedTags: List<String>): Int {
+    val basePrice = 3000
+    val additionalPrice = selectedTags.sumBy { tag ->
+        // You can adjust the prices based on your requirements
+        when (tag) {
+            "Field equipment" -> 500
+            "Inventory" -> 800
+            "Pets" -> 300
+            else -> 0
+        }
+    }
+    return basePrice + additionalPrice
 }
 
 @RequiresApi(Build.VERSION_CODES.O)

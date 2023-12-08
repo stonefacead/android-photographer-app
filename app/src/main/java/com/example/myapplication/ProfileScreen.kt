@@ -3,7 +3,6 @@ package com.example.myapplication
 import android.content.Context.MODE_PRIVATE
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.Image
-import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -13,27 +12,22 @@ import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.AlertDialog
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.runtime.getValue
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.CheckCircle
 import androidx.compose.material.icons.filled.DateRange
 import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material.icons.filled.ExitToApp
 import androidx.compose.material.icons.filled.MoreVert
-import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material.icons.outlined.CheckCircle
 import androidx.compose.material.icons.outlined.DateRange
 import androidx.compose.material3.DropdownMenu
@@ -49,7 +43,6 @@ import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -64,7 +57,6 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.DpOffset
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.compose.ui.window.DialogProperties
 import com.google.accompanist.systemuicontroller.rememberSystemUiController
 
 @ExperimentalMaterial3Api
@@ -200,16 +192,8 @@ fun TopBar(
         modifier = modifier
             .fillMaxWidth()
     ) {
-        Icon(
-            imageVector = Icons.Default.ArrowBack,
-            contentDescription = "Back",
-            tint = Color.Black,
-            modifier = Modifier
-                .size(40.dp)
-                .weight(1f)
-        )
         Text(
-            text = "My profile",
+            text = "    My profile",
             fontWeight = FontWeight.Bold,
             overflow = TextOverflow.Ellipsis,
             fontSize = 35.sp,
@@ -241,7 +225,7 @@ fun TopBar(
                 leadingIcon = {
                     Icon(Icons.Default.ExitToApp, contentDescription = null)
                 },
-                )
+            )
         }
     }
 }
@@ -252,41 +236,41 @@ fun ProfileSection (
     description: String,
     modifier : Modifier = Modifier
 ) {
-        Column(
-            verticalArrangement = Arrangement.Center,
-            horizontalAlignment = Alignment.CenterHorizontally,
+    Column(
+        verticalArrangement = Arrangement.Center,
+        horizontalAlignment = Alignment.CenterHorizontally,
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(horizontal = 20.dp)
+    ) {
+        RoundImage(
+            image = painterResource(id = R.drawable.defaultpfp),
             modifier = Modifier
+                .size(100.dp)
+        )
+        Spacer(modifier = Modifier.width(16.dp))
+        Text(
+            text = name,
+            fontWeight = FontWeight.Bold,
+            overflow = TextOverflow.Ellipsis,
+            fontSize = 35.sp,
+            maxLines = 1,
+        )
+        Spacer(modifier = Modifier.width(16.dp))
+        Row(
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.Start,
+            modifier = modifier
                 .fillMaxWidth()
-                .padding(horizontal = 20.dp)
         ) {
-            RoundImage(
-                image = painterResource(id = R.drawable.defaultpfp),
-                modifier = Modifier
-                    .size(100.dp)
-            )
-            Spacer(modifier = Modifier.width(16.dp))
             Text(
-                text = name,
-                fontWeight = FontWeight.Bold,
+                text = description,
+                fontWeight = FontWeight.SemiBold,
                 overflow = TextOverflow.Ellipsis,
-                fontSize = 35.sp,
-                maxLines = 1,
+                fontSize = 20.sp,
             )
-            Spacer(modifier = Modifier.width(16.dp))
-            Row(
-                verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.Start,
-                modifier = modifier
-                    .fillMaxWidth()
-            ) {
-                Text(
-                    text = description,
-                    fontWeight = FontWeight.SemiBold,
-                    overflow = TextOverflow.Ellipsis,
-                    fontSize = 20.sp,
-                )
-            }
         }
+    }
 }
 
 
@@ -350,7 +334,7 @@ fun ProfileTabRow(menuItems : List<MenuItem>) {
                 .fillMaxWidth()
                 .weight(1f)
         ) {
-            index ->
+                index ->
             Box(modifier = Modifier.fillMaxSize(),
                 contentAlignment = Alignment.Center) {
                 Text(text = menuItems[index].title) //content here
