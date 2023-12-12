@@ -97,9 +97,6 @@ fun IndexPage() {
             Blog()
         }
     }
-
-
-
 }
 
 @Composable
@@ -192,7 +189,6 @@ fun Blog(
             }
         }
     }
-
 }
 
 @ExperimentalComposeUiApi
@@ -475,7 +471,6 @@ fun ImageCarousel() {
     }
 }
 
-//TODO: Make it that when you click on image, it zooms a little bit
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun CustomImageSlider(
@@ -598,7 +593,7 @@ fun DisplayName(name: String) {
     Box(
         modifier = Modifier
             .fillMaxWidth()
-            .height(128.dp) // Adjust the height as needed
+            .height(100.dp) // Adjust the height as needed
             .background(color = Color(0xFFF3EEEA)) // Header background color
     ) {
         Text(
@@ -607,10 +602,9 @@ fun DisplayName(name: String) {
                 .padding(16.dp),
             text = name,
             color = Color.DarkGray, // Text color
-
             style = TextStyle(
                 fontFamily = FontFamily.SansSerif,
-                fontSize = 55.sp,
+                fontSize = 50.sp,
                 fontWeight = FontWeight.Light
             ),
             textAlign = TextAlign.Center

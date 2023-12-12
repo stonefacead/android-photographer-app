@@ -31,6 +31,8 @@ import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.core.content.ContentProviderCompat.requireContext
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
@@ -108,7 +110,7 @@ fun BottomNavMenu(navController: NavController) {
 @Composable
 fun MainNavigation() {
     val navController = rememberNavController()
-
+    val viewModel: SharedViewModel = viewModel()
     androidx.compose.material.Scaffold(
         bottomBar = {
             BottomNavMenu(navController)
@@ -124,13 +126,13 @@ fun MainNavigation() {
                 startDestination = "home"
             ) {
                 composable("profile") {
-                    ProfileScreen()
+                    ProfileScreen(viewModel)
                 }
                 composable("home") {
                     IndexPage()
                 }
                 composable("payment") {
-                    ScreenView()
+                    ScreenView(viewModel)
                 }
             }
         }

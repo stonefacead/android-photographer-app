@@ -29,6 +29,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.viewmodel.compose.viewModel
 import com.vanpra.composematerialdialogs.MaterialDialog
 import com.vanpra.composematerialdialogs.datetime.date.datepicker
 import com.vanpra.composematerialdialogs.datetime.time.timepicker
@@ -36,18 +37,27 @@ import com.vanpra.composematerialdialogs.rememberMaterialDialogState
 import java.time.LocalDate
 import java.time.LocalTime
 import java.time.format.DateTimeFormatter
-import android.content.Context
-import android.content.SharedPreferences
 
 @OptIn(ExperimentalMaterial3Api::class)
 @RequiresApi(Build.VERSION_CODES.O)
 @Composable
-fun ScreenView() {
+fun ScreenView(viewModel: SharedViewModel) {
     val scrollableState = rememberScrollState()
     var selectedTags by remember { mutableStateOf(emptyList<String>()) }
     var totalPrice by remember { mutableIntStateOf(calculateTotalPrice(selectedTags)) }
-    var pickedDate by remember { mutableStateOf(LocalDate.now()) }
-    var pickedTime by remember { mutableStateOf(LocalTime.NOON) }
+    // TextFields for Name, Surname, Phone Number, and Email
+    var name by remember { mutableStateOf("") }
+    var surname by remember { mutableStateOf("") }
+    var phoneNumber by remember { mutableStateOf("") }
+    var email by remember { mutableStateOf("") }
+    // Helper function to validate email format
+    fun isValidEmail(email: String): Boolean {
+        // You can implement your own email validation logic here
+        return android.util.Patterns.EMAIL_ADDRESS.matcher(email).matches()
+    }
+    var areContactFieldsFilled by remember { mutableStateOf(false) }
+    areContactFieldsFilled = name.isNotBlank() && surname.isNotBlank() &&
+            phoneNumber.isNotBlank() && email.isNotBlank() && isValidEmail(email)
 
     Column(
         modifier = Modifier
@@ -57,15 +67,13 @@ fun ScreenView() {
     ) {
         DisplayName("Payment")
         Spacer(modifier = Modifier.height(16.dp))
-        ComposeDateTimePicker(
-            pickedDate = pickedDate,
-            pickedTime = pickedTime,
-            onDateSelected = { pickedDate = it },
-            onTimeSelected = { pickedTime = it }
-        )
+
+        ComposeDateTimePicker(areContactFieldsFilled, viewModel)
+
         Spacer(modifier = Modifier.height(8.dp))
         DividerLine()
         Spacer(modifier = Modifier.height(8.dp))
+
         Column(
             modifier = Modifier.fillMaxWidth(),
             horizontalAlignment = Alignment.CenterHorizontally
@@ -77,6 +85,7 @@ fun ScreenView() {
                 fontWeight = FontWeight.Light
             )
         }
+
         Spacer(modifier = Modifier.height(8.dp))
         Row(
             modifier = Modifier.fillMaxWidth(),
@@ -107,7 +116,7 @@ fun ScreenView() {
             )
         }
         Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.Center)
-        {//TODO: Fix this goddamn textfield
+        {
             var additionalDescription by remember { mutableStateOf("") }
             TextField(
                 value = additionalDescription,
@@ -131,27 +140,6 @@ fun ScreenView() {
         Spacer(modifier = Modifier.height(8.dp))
         DividerLine()
         Spacer(modifier = Modifier.height(8.dp))
-
-
-        // TextFields for Name, Surname, Phone Number, and Email
-        var name by remember { mutableStateOf("") }
-        var surname by remember { mutableStateOf("") }
-        var phoneNumber by remember { mutableStateOf("") }
-        var email by remember { mutableStateOf("") }
-        var isInputValid by remember { mutableStateOf(false) }
-        LaunchedEffect(name, surname, phoneNumber, email) {
-            isInputValid =
-                name.isNotEmpty() && surname.isNotEmpty() && phoneNumber.isNotEmpty() &&
-                        email.isNotEmpty()
-        }
-
-
-        // Helper function to validate email format
-        fun isValidEmail(email: String): Boolean {
-            // You can implement your own email validation logic here
-            return android.util.Patterns.EMAIL_ADDRESS.matcher(email).matches()
-        }
-
 
         Row(
             modifier = Modifier.fillMaxWidth(),
@@ -228,20 +216,13 @@ fun ScreenView() {
                 modifier = Modifier.padding(vertical = 30.dp)
             )
         }
-        BookButton(
-            pickedDate = pickedDate,
-            pickedTime = pickedTime,
-            isInputValid = isInputValid
-        )
     }
 }
 
 @RequiresApi(Build.VERSION_CODES.O)
 @Composable
-fun ComposeDateTimePicker(pickedDate: LocalDate,
-                          pickedTime: LocalTime,
-                          onDateSelected: (LocalDate) -> Unit,
-                          onTimeSelected: (LocalTime) -> Unit) {
+fun ComposeDateTimePicker(areContactFieldsFilled: Boolean,
+                          viewModel: SharedViewModel) {
     var pickedDate by remember {
         mutableStateOf(LocalDate.now())
     }
@@ -284,21 +265,16 @@ fun ComposeDateTimePicker(pickedDate: LocalDate,
             horizontalArrangement = Arrangement.SpaceEvenly
         ) {
             TextButton(modifier = Modifier
-                .background(
-                    color = Color.LightGray,
-                    shape = RoundedCornerShape(16.dp)
-                ),
-                onClick = { dateDialogState.show() }
+                .background(color = Color.LightGray,
+                    shape = RoundedCornerShape(16.dp)),
+                onClick = {dateDialogState.show()}
             ) {
-                Text(
-                    text = "Pick date",
+                Text(text = "Pick date",
                     fontSize = 25.sp,
                     fontFamily = FontFamily.SansSerif,
-                    fontWeight = FontWeight.Light
-                )
+                    fontWeight = FontWeight.Light)
             }
-            Text(
-                text = formattedDate,
+            Text(text = formattedDate,
                 fontSize = 30.sp,
                 fontFamily = FontFamily.SansSerif,
                 fontWeight = FontWeight.Light
@@ -312,21 +288,16 @@ fun ComposeDateTimePicker(pickedDate: LocalDate,
             horizontalArrangement = Arrangement.SpaceBetween
         ) {
             TextButton(modifier = Modifier
-                .background(
-                    color = Color.LightGray,
-                    shape = RoundedCornerShape(16.dp)
-                ),
-                onClick = { timeDialogState.show() }
+                .background(color = Color.LightGray,
+                    shape = RoundedCornerShape(16.dp)),
+                onClick = {timeDialogState.show()}
             ) {
-                Text(
-                    text = "Pick time",
+                Text(text = "Pick time",
                     fontSize = 25.sp,
                     fontFamily = FontFamily.SansSerif,
-                    fontWeight = FontWeight.Light
-                )
+                    fontWeight = FontWeight.Light)
             }
-            Text(
-                text = formattedTime,
+            Text(text = formattedTime,
                 fontSize = 30.sp,
                 fontFamily = FontFamily.SansSerif,
                 fontWeight = FontWeight.Light
@@ -336,11 +307,7 @@ fun ComposeDateTimePicker(pickedDate: LocalDate,
     MaterialDialog(
         dialogState = dateDialogState,
         buttons = {
-            positiveButton(text = "Ok") {
-                if (!bookedDates.contains(pickedDate)) {
-                    bookedDates = bookedDates + pickedDate
-                }
-            }
+            positiveButton(text = "Ok")
             negativeButton(text = "Cancel")
         }
     ) {
@@ -374,6 +341,45 @@ fun ComposeDateTimePicker(pickedDate: LocalDate,
         ) {
             pickedTime = it
         }
+    }
+
+    Spacer(modifier = Modifier.height(8.dp))
+    var pickedSession by remember { mutableStateOf<ScheduledSession?>(null) }
+    TextButton(
+        onClick = {
+            // Perform booking action here
+            if (!bookedDates.contains(pickedDate)) {
+                bookedDates = bookedDates + pickedDate
+                Toast.makeText(
+                    context,
+                    "Booking the date ${pickedDate} at ${pickedTime}",
+                    Toast.LENGTH_LONG
+                ).show()
+                if (pickedSession == null) {
+                    pickedSession = ScheduledSession(
+                        date = pickedDate.toString(),
+                        time = pickedTime.toString()
+                    )
+                }
+                pickedSession?.let {
+                    if (!viewModel.scheduledSessions.value.contains(it)) {
+                        viewModel.scheduledSessions.value = viewModel.scheduledSessions.value + it
+                        // Other actions after booking
+                    }
+                }
+            }
+        },
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(horizontal = 16.dp)
+            .background(
+                color = if (areContactFieldsFilled) Color.Gray else Color.LightGray,
+                shape = RoundedCornerShape(16.dp)
+            )
+            .padding(16.dp),
+        enabled = areContactFieldsFilled
+    ) {
+        Text(text = "Book", fontSize = 30.sp, fontWeight = FontWeight.Light, fontFamily = FontFamily.SansSerif)
     }
 }
 
@@ -419,37 +425,6 @@ fun SwappableTag(text: String, isSelected: Boolean, onTagClick: () -> Unit) {
     }
 }
 
-@Composable
-fun BookButton(pickedDate: LocalDate, pickedTime: LocalTime, isInputValid: Boolean) {
-    val context = LocalContext.current
-
-    TextButton(
-        onClick = {
-            // Perform booking action only if input is valid
-            if (isInputValid) {
-                Toast.makeText(
-                    context,
-                    "Booking the date $pickedDate at $pickedTime",
-                    Toast.LENGTH_LONG
-                ).show()
-            }
-        },
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(horizontal = 16.dp)
-            .background(
-                color = if (isInputValid) Color.Gray else Color.LightGray,
-                shape = RoundedCornerShape(16.dp)
-            )
-            .padding(16.dp),
-        enabled = isInputValid
-    ) {
-        Text(text = "Book", fontSize = 30.sp, fontWeight = FontWeight.Light, fontFamily = FontFamily.SansSerif)
-    }
-}
-
-
-
 fun calculateTotalPrice(selectedTags: List<String>): Int {
     val basePrice = 3000
     val additionalPrice = selectedTags.sumBy { tag ->
@@ -468,5 +443,6 @@ fun calculateTotalPrice(selectedTags: List<String>): Int {
 @Preview(showBackground = true)
 @Composable
 fun CalendarPreview() {
-    ScreenView()
+    val viewModel: SharedViewModel = viewModel()
+    ScreenView(viewModel)
 }
